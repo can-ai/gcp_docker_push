@@ -1,20 +1,23 @@
 steps:
-  # Step 1: Build the Docker image using secret
+  # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'docker.io/$_DOCKER_USERNAME/comfy-with-wan2.1-cnet:$BUILD_ID', '.']
+    args: ['build', '-t', 'docker.io/$DOCKER_USERNAME/comfy-with-wan2.1-cnet:$BUILD_ID', '.']
     secretEnv: ['DOCKER_USERNAME']
+
   # Step 2: Authenticate with Docker Hub
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "$$DOCKER_PASSWORD" | docker login -u "$$DOCKER_USERNAME" --password-stdin
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
-  # Step 3: Push the Docker image to Docker Hub
+
+  # Step 3: Push the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'docker.io/$_DOCKER_USERNAME/comfy-with-wan2.1-cnet:$BUILD_ID']
+    args: ['push', 'docker.io/$DOCKER_USERNAME/comfy-with-wan2.1-cnet:$BUILD_ID']
     secretEnv: ['DOCKER_USERNAME']
+
 availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/docker-username/versions/latest
